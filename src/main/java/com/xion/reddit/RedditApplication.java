@@ -19,7 +19,7 @@ public class RedditApplication {
         System.out.println("Welcome Reddit!");
     }
 
-    @Bean
+//    @Bean
     CommandLineRunner runner(LinkRepository linkRepository, CommentRepository commentRepository) {
         return args -> {
             Link link = new Link("Getting Started With Spring Boot 2!", "https://therealdanvega.com/spring-boot-2");
