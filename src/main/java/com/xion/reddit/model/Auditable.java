@@ -22,7 +22,7 @@ public abstract class Auditable {
     private String createBy;
 
     @CreatedDate
-    private LocalDateTime creationTime;
+    private LocalDateTime creationDate;
 
     @LastModifiedBy
     private String lastModifiedBy;
