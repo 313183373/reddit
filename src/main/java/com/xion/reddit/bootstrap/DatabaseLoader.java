@@ -73,6 +73,7 @@ public class DatabaseLoader implements CommandLineRunner {
 
         userRepository.save(user);
         userRepository.save(admin);
+        userRepository.save(master);
 
     }
 }
