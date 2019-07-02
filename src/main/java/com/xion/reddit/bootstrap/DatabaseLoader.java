@@ -1,19 +1,30 @@
 package com.xion.reddit.bootstrap;
 
 import com.xion.reddit.model.Link;
+import com.xion.reddit.model.Role;
+import com.xion.reddit.model.User;
 import com.xion.reddit.repository.LinkRepository;
+import com.xion.reddit.repository.RoleRepository;
+import com.xion.reddit.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 @Component
 public class DatabaseLoader implements CommandLineRunner {
     private LinkRepository linkRepository;
+    private RoleRepository roleRepository;
+    private UserRepository userRepository;
 
-    public DatabaseLoader(LinkRepository linkRepository) {
+    public DatabaseLoader(LinkRepository linkRepository, RoleRepository roleRepository, UserRepository userRepository) {
         this.linkRepository = linkRepository;
+        this.roleRepository = roleRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -38,5 +49,30 @@ public class DatabaseLoader implements CommandLineRunner {
 
         long linkCount = linkRepository.count();
         System.out.println("Number of links in the database: " + linkCount);
+
+        addUsersAndRoles();
+    }
+
+    private void addUsersAndRoles() {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String secret = "{bcrypt}" + encoder.encode("password");
+
+        Role userRole = new Role("ROLE_USER");
+        Role adminRole = new Role("ROLE_ADMIN");
+
+        roleRepository.save(userRole);
+        roleRepository.save(adminRole);
+
+        User user = new User("user@gmail.com", secret, true);
+        User admin = new User("admin@gmail.com", secret, true);
+        User master = new User("master@gmail.com", secret, true);
+
+        user.addRole(userRole);
+        admin.addRole(adminRole);
+        master.addRoles(new HashSet<>(Arrays.asList(userRole, adminRole)));
+
+        userRepository.save(user);
+        userRepository.save(admin);
+
     }
 }
