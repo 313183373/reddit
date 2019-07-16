@@ -35,9 +35,4 @@ public class RedditApplication {
     PrettyTime prettyTime() {
         return new PrettyTime();
     }
-
-    @Bean
-    public SpringSecurityDialect securityDialect() {
-        return new SpringSecurityDialect();
-    }
 }
