@@ -29,9 +29,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/h2-console/**").permitAll()
                 .and()
                 .formLogin()
+                .loginPage("/login")
+                .usernameParameter("email")
+                .permitAll()
                 .and()
-                .csrf().disable()
-                .headers().frameOptions().disable();
+                .logout()
+                .and()
+                .rememberMe().key("reddit");
+//                .and()
+//                .csrf().disable()
+//                .headers().frameOptions().disable();
     }
 
     @Override
