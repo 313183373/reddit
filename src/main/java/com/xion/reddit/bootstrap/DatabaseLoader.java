@@ -1,8 +1,10 @@
 package com.xion.reddit.bootstrap;
 
+import com.xion.reddit.model.Comment;
 import com.xion.reddit.model.Link;
 import com.xion.reddit.model.Role;
 import com.xion.reddit.model.User;
+import com.xion.reddit.repository.CommentRepository;
 import com.xion.reddit.repository.LinkRepository;
 import com.xion.reddit.repository.RoleRepository;
 import com.xion.reddit.repository.UserRepository;
@@ -20,11 +22,13 @@ public class DatabaseLoader implements CommandLineRunner {
     private LinkRepository linkRepository;
     private RoleRepository roleRepository;
     private UserRepository userRepository;
+    private CommentRepository commentRepository;
 
-    public DatabaseLoader(LinkRepository linkRepository, RoleRepository roleRepository, UserRepository userRepository) {
+    public DatabaseLoader(LinkRepository linkRepository, RoleRepository roleRepository, UserRepository userRepository, CommentRepository commentRepository) {
         this.linkRepository = linkRepository;
         this.roleRepository = roleRepository;
         this.userRepository = userRepository;
+        this.commentRepository = commentRepository;
     }
 
     @Override
@@ -43,8 +47,17 @@ public class DatabaseLoader implements CommandLineRunner {
         links.put("File download example using Spring REST Controller", "https://www.jeejava.com/file-download-example-using-spring-rest-controller/");
 
         links.forEach((k, v) -> {
-            linkRepository.save(new Link(k, v));
-            // we will do something with comments later
+            Link link = new Link(k, v);
+            linkRepository.save(link);
+
+            Comment spring = new Comment("Thank you for this link related to Spring Boot. I love it, great post!", link);
+            Comment security = new Comment("I love that you're talking about Spring Security!", link);
+            Comment pwa = new Comment("What is this Progressive Web App all about? PWAs sounds really cool!", link);
+            Comment[] comments = {spring, security, pwa};
+            for (Comment comment : comments) {
+                link.addComment(comment);
+                commentRepository.save(comment);
+            }
         });
 
         long linkCount = linkRepository.count();

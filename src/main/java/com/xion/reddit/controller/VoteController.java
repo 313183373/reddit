@@ -2,7 +2,7 @@ package com.xion.reddit.controller;
 
 import com.xion.reddit.model.Link;
 import com.xion.reddit.model.Vote;
-import com.xion.reddit.model.VoteRepository;
+import com.xion.reddit.repository.VoteRepository;
 import com.xion.reddit.repository.LinkRepository;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;

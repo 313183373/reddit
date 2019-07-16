@@ -1,9 +1,12 @@
 package com.xion.reddit.controller;
 
+import com.xion.reddit.model.Comment;
 import com.xion.reddit.model.Link;
+import com.xion.reddit.repository.CommentRepository;
 import com.xion.reddit.repository.LinkRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -19,11 +22,13 @@ import java.util.Optional;
 public class LinkController {
 
     private LinkRepository linkRepository;
+    private CommentRepository commentRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(LinkController.class);
 
-    public LinkController(LinkRepository linkRepository) {
+    public LinkController(LinkRepository linkRepository, CommentRepository commentRepository) {
         this.linkRepository = linkRepository;
+        this.commentRepository = commentRepository;
     }
 
     @GetMapping("/")
@@ -34,10 +39,13 @@ public class LinkController {
 
     @GetMapping("/link/{id}")
     public String link(@PathVariable Long id, Model model) {
-        System.out.println("get link id:" + id);
         Optional<Link> link = linkRepository.findById(id);
         if (link.isPresent()) {
-            model.addAttribute("link", link.get());
+            Link currentLink = link.get();
+            Comment comment = new Comment();
+            comment.setLink(currentLink);
+            model.addAttribute("comment", comment);
+            model.addAttribute("link", currentLink);
             model.addAttribute("success", model.containsAttribute("success"));
             return "link/view";
         } else {
@@ -65,5 +73,16 @@ public class LinkController {
                     .addFlashAttribute("success", true);
             return "redirect:/link/{id}";
         }
+    }
+
+    @PostMapping("/link/comments")
+    @Secured({"ROLE_USER"})
+    public String createComment(@Valid Comment comment, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            logger.info("There was a problem creating a comment");
+        } else {
+            commentRepository.save(comment);
+        }
+        return "redirect:/link/" + comment.getLink().getId();
     }
 }
