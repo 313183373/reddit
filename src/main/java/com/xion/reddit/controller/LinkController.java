@@ -2,8 +2,8 @@ package com.xion.reddit.controller;
 
 import com.xion.reddit.model.Comment;
 import com.xion.reddit.model.Link;
-import com.xion.reddit.repository.CommentRepository;
-import com.xion.reddit.repository.LinkRepository;
+import com.xion.reddit.service.CommentService;
+import com.xion.reddit.service.LinkService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.annotation.Secured;
@@ -21,25 +21,24 @@ import java.util.Optional;
 @Controller
 public class LinkController {
 
-    private LinkRepository linkRepository;
-    private CommentRepository commentRepository;
-
+    private LinkService linkService;
+    private CommentService commentService;
     private static final Logger logger = LoggerFactory.getLogger(LinkController.class);
 
-    public LinkController(LinkRepository linkRepository, CommentRepository commentRepository) {
-        this.linkRepository = linkRepository;
-        this.commentRepository = commentRepository;
+    public LinkController(LinkService linkService, CommentService commentService) {
+        this.linkService = linkService;
+        this.commentService = commentService;
     }
 
     @GetMapping("/")
     public String list(Model model) {
-        model.addAttribute("links", linkRepository.findAll());
+        model.addAttribute("links", linkService.findAll());
         return "link/list";
     }
 
     @GetMapping("/link/{id}")
     public String link(@PathVariable Long id, Model model) {
-        Optional<Link> link = linkRepository.findById(id);
+        Optional<Link> link = linkService.findById(id);
         if (link.isPresent()) {
             Link currentLink = link.get();
             Comment comment = new Comment();
@@ -66,7 +65,7 @@ public class LinkController {
             model.addAttribute("link", link);
             return "link/submit";
         } else {
-            linkRepository.save(link);
+            linkService.save(link);
             logger.info("New link was saved successfully");
             redirectAttributes
                     .addAttribute("id", link.getId())
@@ -81,7 +80,7 @@ public class LinkController {
         if (bindingResult.hasErrors()) {
             logger.info("There was a problem creating a comment");
         } else {
-            commentRepository.save(comment);
+            commentService.save(comment);
         }
         return "redirect:/link/" + comment.getLink().getId();
     }

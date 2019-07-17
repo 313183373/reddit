@@ -2,8 +2,8 @@ package com.xion.reddit.controller;
 
 import com.xion.reddit.model.Link;
 import com.xion.reddit.model.Vote;
-import com.xion.reddit.repository.VoteRepository;
-import com.xion.reddit.repository.LinkRepository;
+import com.xion.reddit.service.LinkService;
+import com.xion.reddit.service.VoteService;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,26 +14,26 @@ import java.util.Optional;
 @RestController
 public class VoteController {
 
-    private LinkRepository linkRepository;
-    private VoteRepository voteRepository;
+    private LinkService linkService;
+    private VoteService voteService;
 
-    public VoteController(LinkRepository linkRepository, VoteRepository voteRepository) {
-        this.linkRepository = linkRepository;
-        this.voteRepository = voteRepository;
+    public VoteController(LinkService linkService, VoteService voteService) {
+        this.linkService = linkService;
+        this.voteService = voteService;
     }
 
     @GetMapping("/vote/link/{linkId}/direction/{direction}")
     @Secured({"ROLE_USER"})
     public int vote(@PathVariable Long linkId, @PathVariable short direction) {
-        Optional<Link> optionalLink = linkRepository.findById(linkId);
+        Optional<Link> optionalLink = linkService.findById(linkId);
         if (optionalLink.isPresent()) {
             Link link = optionalLink.get();
             Vote vote = new Vote(direction, link);
-            voteRepository.save(vote);
+            voteService.save(vote);
 
             int newVoteCount = link.getVoteCount() + direction;
             link.setVoteCount(newVoteCount);
-            linkRepository.save(link);
+            linkService.save(link);
             return newVoteCount;
         }
         return 0;
