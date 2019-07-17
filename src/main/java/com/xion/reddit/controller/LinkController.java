@@ -2,11 +2,13 @@ package com.xion.reddit.controller;
 
 import com.xion.reddit.model.Comment;
 import com.xion.reddit.model.Link;
+import com.xion.reddit.model.User;
 import com.xion.reddit.service.CommentService;
 import com.xion.reddit.service.LinkService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -65,6 +67,8 @@ public class LinkController {
             model.addAttribute("link", link);
             return "link/submit";
         } else {
+            User user = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+            link.setUser(user);
             linkService.save(link);
             logger.info("New link was saved successfully");
             redirectAttributes
