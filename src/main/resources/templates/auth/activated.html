@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layouts/main_layout :: head(title = 'Spring Boot Reddit Clone')}">
+</head>
+<body>
+<nav th:replace="~{layouts/main_layout :: nav}"></nav>
+<div th:replace="~{layouts/main_layout :: jumbotron}"></div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-3"></div>
+        <div class="col-6 alert alert-success">
+            You're account has been activated and you can now <a th:href="@{/login}">login</a>
+        </div>
+        <div class="col-3"></div>
+    </div>
+</div>
+</body>
+</html>
